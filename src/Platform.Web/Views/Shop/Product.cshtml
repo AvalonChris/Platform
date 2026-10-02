@@ -1,0 +1,75 @@
+@model ProductViewModel
+@inject Microsoft.Extensions.Options.IOptions<StoreOptions> Options
+@{
+    var product = Model.Product;
+    ViewData["Title"] = product.Name;
+}
+
+<section class="section product">
+    <div class="product-media">
+        @if (product.ImageUrl is not null)
+        {
+            <img src="@product.ImageUrl" alt="@product.Name" />
+        }
+    </div>
+    <div class="product-info">
+        <div class="eyebrow">@(product.IsStack ? "Stack" : "Single supplement")</div>
+        <h1>@product.Name</h1>
+        <div class="card-spec">@product.ShortSpec</div>
+
+        @if (Model.StackComponents.Count > 0)
+        {
+            <div class="panel">
+                <strong>In this stack</strong>
+                <ul>
+                    @foreach (var component in Model.StackComponents)
+                    {
+                        <li><a asp-action="Product" asp-route-slug="@component.Slug">@component.Name</a></li>
+                    }
+                </ul>
+            </div>
+        }
+
+        <p>@product.Description</p>
+
+        <form class="purchase" asp-controller="Cart" asp-action="Add" method="post">
+            <input type="hidden" name="productId" value="@product.Id" />
+
+            <fieldset class="options">
+                <legend class="sr-only">Purchase option</legend>
+                <label class="option">
+                    <input type="radio" name="purchaseMode" value="@PurchaseModes.Subscription" checked />
+                    <span class="option-text">
+                        <strong>Subscribe <span class="badge">Save @Options.Value.SubscriptionDiscountPercent%</span></strong>
+                        <small>Skip, pause or cancel any time</small>
+                    </span>
+                    <strong>@Money.Format(Options.Value.SubscribedPrice(product.Price))</strong>
+                </label>
+                <label class="option">
+                    <input type="radio" name="purchaseMode" value="@PurchaseModes.Once" />
+                    <span class="option-text"><strong>One-time purchase</strong></span>
+                    <strong>@Money.Format(product.Price)</strong>
+                </label>
+            </fieldset>
+
+            <fieldset class="frequency">
+                <legend>Deliver</legend>
+                <div class="pills">
+                    @foreach (var days in new[] { 30, 60, 90 })
+                    {
+                        <label class="pill-radio">
+                            <input type="radio" name="frequencyDays" value="@days" checked="@(days == 30)" />
+                            <span class="pill">Every @days days</span>
+                        </label>
+                    }
+                </div>
+            </fieldset>
+
+            <div class="purchase-row">
+                <label class="sr-only" for="quantity">Quantity</label>
+                <input class="qty" id="quantity" type="number" name="quantity" value="1" min="1" max="@Platform.Web.Data.CartRepository.MaxQuantity" />
+                <button class="button" type="submit">Add to cart</button>
+            </div>
+        </form>
+    </div>
+</section>

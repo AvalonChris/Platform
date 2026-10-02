@@ -1,0 +1,56 @@
+@model CartViewModel
+@{
+    ViewData["Title"] = "Cart";
+}
+
+<section class="section">
+    <h1>Your cart</h1>
+
+    @if (Model.Items.Count == 0)
+    {
+        <div class="cart-empty">
+            <p>Your cart is empty.</p>
+            <a class="button" asp-controller="Shop" asp-action="Index">Shop all</a>
+        </div>
+    }
+    else
+    {
+        <div class="cart">
+            <div class="cart-lines">
+                @foreach (var item in Model.Items)
+                {
+                    var line = item.Line;
+                    <article class="cart-line">
+                        <div class="cart-line-media">
+                            @if (line.ImageUrl is not null)
+                            {
+                                <img src="@line.ImageUrl" alt="" />
+                            }
+                        </div>
+                        <div class="cart-line-info">
+                            <a asp-controller="Shop" asp-action="Product" asp-route-slug="@line.Slug">@line.Name</a>
+                            <div class="card-spec">@item.PlanText</div>
+                            <div class="card-spec">@Money.Format(item.UnitPrice) each</div>
+                        </div>
+                        <form class="cart-line-qty" asp-action="Update" asp-route-id="@line.Id" method="post">
+                            <label class="sr-only" for="quantity-@line.Id">Quantity for @line.Name</label>
+                            <input class="qty" id="quantity-@line.Id" type="number" name="quantity" value="@line.Quantity" min="1" max="@Platform.Web.Data.CartRepository.MaxQuantity" />
+                            <button class="link-button" type="submit">Update</button>
+                        </form>
+                        <div class="cart-line-total">@Money.Format(item.LineTotal)</div>
+                        <form asp-action="Remove" asp-route-id="@line.Id" method="post">
+                            <button class="link-button" type="submit" aria-label="Remove @line.Name">Remove</button>
+                        </form>
+                    </article>
+                }
+            </div>
+            <aside class="summary">
+                <h2>Summary</h2>
+                <div class="summary-row"><span>Subtotal</span><strong>@Money.Format(Model.Subtotal)</strong></div>
+                <div class="summary-row muted"><span>Shipping and tax</span><span>At checkout</span></div>
+                <a class="button" asp-controller="Checkout" asp-action="Index">Checkout</a>
+                <a asp-controller="Shop" asp-action="Index">Keep shopping</a>
+            </aside>
+        </div>
+    }
+</section>

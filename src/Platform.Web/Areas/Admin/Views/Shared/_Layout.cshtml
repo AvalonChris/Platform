@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>@ViewData["Title"] · Admin</title>
+    <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="bar">
+        <strong>Admin</strong>
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <nav aria-label="Admin">
+                <a asp-area="Admin" asp-controller="Orders" asp-action="Index">Orders</a>
+                <a asp-area="Admin" asp-controller="Subscriptions" asp-action="Index">Subscriptions</a>
+                <a asp-area="Admin" asp-controller="Products" asp-action="Index">Products</a>
+            </nav>
+            <a href="/">View store</a>
+            <form asp-area="Admin" asp-controller="Account" asp-action="Logout" method="post">
+                <button class="link" type="submit">Sign out</button>
+            </form>
+        }
+    </header>
+
+    <main>
+        @if (TempData["Message"] is string message)
+        {
+            <div class="message" role="status">@message</div>
+        }
+        @RenderBody()
+    </main>
+</body>
+</html>

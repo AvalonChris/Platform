@@ -1,0 +1,50 @@
+@model IReadOnlyList<ProductForm>
+@{
+    ViewData["Title"] = "Products";
+}
+
+<div class="head">
+    <h1>Products</h1>
+    <a class="primary" asp-action="New">New product</a>
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Kind</th>
+                <th>SKU</th>
+                <th class="num">Price</th>
+                <th class="num">Stock</th>
+                <th>Shown</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model)
+            {
+                <tr>
+                    <td><a asp-action="Edit" asp-route-id="@product.Id">@product.Name</a></td>
+                    <td>@(product.IsStack ? "Stack" : "Single")</td>
+                    <td>@product.Sku</td>
+                    <td class="num">@Money.Format(product.Price)</td>
+                    <td class="num">@(product.IsStack ? "" : product.StockQuantity.ToString())</td>
+                    <td>
+                        @if (!product.IsActive)
+                        {
+                            <span class="tag off">Hidden</span>
+                        }
+                        @if (product.IsFeatured)
+                        {
+                            <span class="tag">Featured</span>
+                        }
+                        @if (product.IsNew)
+                        {
+                            <span class="tag">New</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

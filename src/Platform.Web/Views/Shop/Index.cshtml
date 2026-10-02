@@ -1,0 +1,19 @@
+@model ShopViewModel
+@{
+    ViewData["Title"] = "Shop";
+}
+
+<section class="section">
+    <h1>Shop</h1>
+    <nav aria-label="Filter products" class="pills">
+        <a class="pill" asp-action="Index" aria-current="@(Model.Kind is null ? "page" : null)">All</a>
+        <a class="pill" asp-action="Index" asp-route-kind="@Product.KindSingle" aria-current="@(Model.Kind == Product.KindSingle ? "page" : null)">Single supplements</a>
+        <a class="pill" asp-action="Index" asp-route-kind="@Product.KindStack" aria-current="@(Model.Kind == Product.KindStack ? "page" : null)">Stacks</a>
+    </nav>
+    <div class="grid">
+        @foreach (var product in Model.Products)
+        {
+            <partial name="_ProductCard" model="product" />
+        }
+    </div>
+</section>

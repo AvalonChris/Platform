@@ -1,0 +1,29 @@
+@model HomeViewModel
+
+<section class="section">
+    <div class="section-head">
+        <h1>Featured</h1>
+        <a asp-controller="Shop" asp-action="Index">Shop all</a>
+    </div>
+    <div class="grid">
+        @foreach (var product in Model.Featured)
+        {
+            <partial name="_ProductCard" model="product" />
+        }
+    </div>
+</section>
+
+@if (Model.New.Count > 0)
+{
+    <section class="section">
+        <div class="section-head">
+            <h2>New</h2>
+        </div>
+        <div class="grid">
+            @foreach (var product in Model.New)
+            {
+                <partial name="_ProductCard" model="product" />
+            }
+        </div>
+    </section>
+}

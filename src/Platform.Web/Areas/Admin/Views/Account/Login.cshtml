@@ -1,0 +1,22 @@
+@model LoginForm
+@{
+    ViewData["Title"] = "Sign in";
+}
+
+<h1>Sign in</h1>
+
+<form class="form narrow" asp-action="Login" method="post">
+    <div class="error" asp-validation-summary="ModelOnly"></div>
+    <input type="hidden" asp-for="ReturnUrl" />
+    <div class="field">
+        <label asp-for="Email">Email</label>
+        <input asp-for="Email" type="email" autocomplete="username" required autofocus />
+        <span class="error" asp-validation-for="Email"></span>
+    </div>
+    <div class="field">
+        <label asp-for="Password">Password</label>
+        <input asp-for="Password" type="password" autocomplete="current-password" required />
+        <span class="error" asp-validation-for="Password"></span>
+    </div>
+    <div><button class="primary" type="submit">Sign in</button></div>
+</form>

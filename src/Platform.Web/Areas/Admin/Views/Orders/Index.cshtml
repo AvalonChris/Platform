@@ -1,0 +1,49 @@
+@model OrderListViewModel
+@{
+    ViewData["Title"] = "Orders";
+}
+
+<div class="head">
+    <h1>Orders</h1>
+</div>
+
+<nav aria-label="Filter by status" class="filters">
+    <a asp-action="Index" aria-current="@(Model.Status is null ? "page" : null)">All</a>
+    @foreach (var status in OrderListViewModel.Statuses)
+    {
+        <a asp-action="Index" asp-route-status="@status" aria-current="@(Model.Status == status ? "page" : null)">@status</a>
+    }
+</nav>
+
+@if (Model.Orders.Count == 0)
+{
+    <p>No orders.</p>
+}
+else
+{
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Order</th>
+                    <th>Created</th>
+                    <th>Customer</th>
+                    <th>Status</th>
+                    <th class="num">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model.Orders)
+                {
+                    <tr>
+                        <td><a asp-action="Detail" asp-route-id="@order.Id">@order.OrderNumber</a></td>
+                        <td>@AdminFormat.DateTime(order.CreatedAt)</td>
+                        <td>@order.Email</td>
+                        <td><span class="tag">@order.Status</span></td>
+                        <td class="num">@Money.Format(order.Total)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

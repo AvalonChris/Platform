@@ -1,0 +1,111 @@
+@model CheckoutViewModel
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<section class="section">
+    <h1>Checkout</h1>
+
+    <div class="cart">
+        <form class="checkout-form" asp-action="Place" method="post">
+            @if (Model.PaymentError is not null)
+            {
+                <div class="alert" role="alert">@Model.PaymentError</div>
+            }
+
+            <fieldset class="panel form-section">
+                <legend>Contact</legend>
+                <div class="field">
+                    <label asp-for="Form.Email">Email</label>
+                    <input asp-for="Form.Email" type="email" autocomplete="email" required />
+                    <span class="field-error" asp-validation-for="Form.Email"></span>
+                </div>
+            </fieldset>
+
+            <fieldset class="panel form-section">
+                <legend>Shipping address</legend>
+                <div class="field">
+                    <label asp-for="Form.FullName">Full name</label>
+                    <input asp-for="Form.FullName" autocomplete="name" required />
+                    <span class="field-error" asp-validation-for="Form.FullName"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="Form.Line1">Address</label>
+                    <input asp-for="Form.Line1" autocomplete="address-line1" required />
+                    <span class="field-error" asp-validation-for="Form.Line1"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="Form.Line2">Apartment, suite, etc. (optional)</label>
+                    <input asp-for="Form.Line2" autocomplete="address-line2" />
+                    <span class="field-error" asp-validation-for="Form.Line2"></span>
+                </div>
+                <div class="field-row">
+                    <div class="field field-wide">
+                        <label asp-for="Form.City">City</label>
+                        <input asp-for="Form.City" autocomplete="address-level2" required />
+                        <span class="field-error" asp-validation-for="Form.City"></span>
+                    </div>
+                    <div class="field">
+                        <label asp-for="Form.Region">State</label>
+                        <select asp-for="Form.Region" autocomplete="address-level1" required>
+                            <option value="">Select</option>
+                            @foreach (var state in UsStates.All)
+                            {
+                                <option value="@state.Code">@state.Name</option>
+                            }
+                        </select>
+                        <span class="field-error" asp-validation-for="Form.Region"></span>
+                    </div>
+                    <div class="field">
+                        <label asp-for="Form.PostalCode">ZIP code</label>
+                        <input asp-for="Form.PostalCode" autocomplete="postal-code" inputmode="numeric" required />
+                        <span class="field-error" asp-validation-for="Form.PostalCode"></span>
+                    </div>
+                </div>
+                <div class="field">
+                    <label asp-for="Form.Phone">Phone (optional)</label>
+                    <input asp-for="Form.Phone" type="tel" autocomplete="tel" />
+                    <span class="field-error" asp-validation-for="Form.Phone"></span>
+                </div>
+            </fieldset>
+
+            <fieldset class="panel form-section">
+                <legend>Payment</legend>
+                <p class="muted">@Model.PaymentDescription</p>
+            </fieldset>
+
+            @if (Model.Cart.HasSubscription)
+            {
+                <div class="consent">
+                    <input asp-for="Form.AcceptRenewal" />
+                    <label asp-for="Form.AcceptRenewal">
+                        I agree that my subscription items renew automatically at @Money.Format(Model.Cart.RenewalTotal)
+                        per delivery, on the schedule shown for each item, until I cancel.
+                    </label>
+                </div>
+                <span class="field-error" asp-validation-for="Form.AcceptRenewal"></span>
+            }
+
+            <button class="button" type="submit">Place order · @Money.Format(Model.Total)</button>
+        </form>
+
+        <aside class="summary">
+            <h2>Order summary</h2>
+            @foreach (var item in Model.Cart.Items)
+            {
+                <div class="summary-row">
+                    <div>
+                        <div>@item.Line.Quantity × @item.Line.Name</div>
+                        <div class="card-spec">@item.PlanText</div>
+                    </div>
+                    <strong>@Money.Format(item.LineTotal)</strong>
+                </div>
+            }
+            <hr />
+            <div class="summary-row"><span>Subtotal</span><strong>@Money.Format(Model.Cart.Subtotal)</strong></div>
+            <div class="summary-row"><span>Shipping</span><span>@(Model.Shipping == 0 ? "Free" : Money.Format(Model.Shipping))</span></div>
+            <div class="summary-row"><span>Total</span><strong>@Money.Format(Model.Total)</strong></div>
+            <a asp-controller="Cart" asp-action="Index">Edit cart</a>
+        </aside>
+    </div>
+</section>

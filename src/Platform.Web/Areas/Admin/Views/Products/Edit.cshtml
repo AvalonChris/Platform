@@ -1,0 +1,110 @@
+@model ProductEditViewModel
+@{
+    ViewData["Title"] = Model.IsNew ? "New product" : Model.Form.Name;
+}
+
+<div class="head">
+    <h1>@ViewData["Title"]</h1>
+    <a asp-action="Index">Back to products</a>
+</div>
+
+<form class="form" asp-action="@(Model.IsNew ? "Create" : "Update")" asp-route-id="@(Model.IsNew ? null : Model.Form.Id)" method="post">
+    <div class="field">
+        <label asp-for="Form.Name">Name</label>
+        <input asp-for="Form.Name" required />
+        <span class="error" asp-validation-for="Form.Name"></span>
+    </div>
+
+    <div class="row">
+        <div class="field">
+            <label asp-for="Form.Slug">URL slug</label>
+            <input asp-for="Form.Slug" required />
+            <span class="hint">The product's address: /products/<em>slug</em></span>
+            <span class="error" asp-validation-for="Form.Slug"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Form.Sku">SKU</label>
+            <input asp-for="Form.Sku" required />
+            <span class="error" asp-validation-for="Form.Sku"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Form.Kind">Kind</label>
+            @if (Model.IsNew)
+            {
+                <select asp-for="Form.Kind">
+                    <option value="@Product.KindSingle">Single supplement</option>
+                    <option value="@Product.KindStack">Stack</option>
+                </select>
+                <span class="hint">Can't be changed later.</span>
+            }
+            else
+            {
+                <input value="@(Model.Form.IsStack ? "Stack" : "Single supplement")" disabled />
+            }
+            <span class="error" asp-validation-for="Form.Kind"></span>
+        </div>
+    </div>
+
+    <div class="field">
+        <label asp-for="Form.ShortSpec">Short spec</label>
+        <input asp-for="Form.ShortSpec" />
+        <span class="hint">Shown under the name, for example "500 mg · 60 capsules".</span>
+        <span class="error" asp-validation-for="Form.ShortSpec"></span>
+    </div>
+
+    <div class="field">
+        <label asp-for="Form.Description">Description</label>
+        <textarea asp-for="Form.Description" rows="5"></textarea>
+    </div>
+
+    <div class="row">
+        <div class="field">
+            <label asp-for="Form.Price">Price (USD)</label>
+            <input asp-for="Form.Price" type="number" step="0.01" min="0" required />
+            <span class="error" asp-validation-for="Form.Price"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Form.StockQuantity">Stock</label>
+            <input asp-for="Form.StockQuantity" type="number" min="0" />
+            <span class="error" asp-validation-for="Form.StockQuantity"></span>
+        </div>
+        <div class="field">
+            <label asp-for="Form.SortOrder">Sort order</label>
+            <input asp-for="Form.SortOrder" type="number" />
+            <span class="hint">Lower numbers come first.</span>
+        </div>
+    </div>
+
+    <div class="field">
+        <label asp-for="Form.ImageUrl">Image URL</label>
+        <input asp-for="Form.ImageUrl" />
+        <span class="error" asp-validation-for="Form.ImageUrl"></span>
+    </div>
+
+    <fieldset>
+        <legend>Visibility</legend>
+        <label class="check"><input asp-for="Form.IsActive" /> Active (visible in the store)</label>
+        <label class="check"><input asp-for="Form.IsFeatured" /> Featured on the home page</label>
+        <label class="check"><input asp-for="Form.IsNew" /> Shown under New on the home page</label>
+    </fieldset>
+
+    @if (Model.IsNew || Model.Form.IsStack)
+    {
+        <fieldset>
+            <legend>Stack contents</legend>
+            @if (Model.IsNew)
+            {
+                <span class="hint">Only used when the kind is Stack.</span>
+            }
+            @foreach (var single in Model.Singles)
+            {
+                <label class="check">
+                    <input type="checkbox" name="Form.ComponentIds" value="@single.Id" checked="@Model.Form.ComponentIds.Contains(single.Id)" />
+                    @single.Name
+                </label>
+            }
+        </fieldset>
+    }
+
+    <div><button class="primary" type="submit">@(Model.IsNew ? "Create product" : "Save changes")</button></div>
+</form>

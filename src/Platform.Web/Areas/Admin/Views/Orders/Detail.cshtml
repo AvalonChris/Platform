@@ -1,0 +1,85 @@
+@model OrderViewModel
+@{
+    var order = Model.Order;
+    ViewData["Title"] = $"Order {order.OrderNumber}";
+}
+
+<div class="head">
+    <h1>Order @order.OrderNumber <span class="tag">@order.Status</span></h1>
+    <a asp-action="Index">Back to orders</a>
+</div>
+
+<div class="actions">
+    @if (order.Status == "paid")
+    {
+        <form asp-action="Fulfill" asp-route-id="@order.Id" method="post">
+            <button class="primary" type="submit">Mark as fulfilled</button>
+        </form>
+    }
+    @if (order.Status is "pending" or "paid")
+    {
+        <form asp-action="Cancel" asp-route-id="@order.Id" method="post">
+            <button type="submit">Cancel order</button>
+        </form>
+    }
+</div>
+
+<div class="table-wrap">
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Plan</th>
+                <th class="num">Qty</th>
+                <th class="num">Unit price</th>
+                <th class="num">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td>@item.PlanText</td>
+                    <td class="num">@item.Quantity</td>
+                    <td class="num">@Money.Format(item.UnitPrice)</td>
+                    <td class="num">@Money.Format(item.LineTotal)</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr><td colspan="4" class="num">Subtotal</td><td class="num">@Money.Format(order.Subtotal)</td></tr>
+            <tr><td colspan="4" class="num">Shipping</td><td class="num">@Money.Format(order.ShippingTotal)</td></tr>
+            <tr><td colspan="4" class="num">Tax</td><td class="num">@Money.Format(order.TaxTotal)</td></tr>
+            <tr><td colspan="4" class="num"><strong>Total</strong></td><td class="num"><strong>@Money.Format(order.Total)</strong></td></tr>
+        </tfoot>
+    </table>
+</div>
+
+<div class="columns">
+    <section>
+        <h2>Ship to</h2>
+        <address>
+            @order.ShipFullName<br />
+            @order.ShipLine1<br />
+            @if (order.ShipLine2.Length > 0)
+            {
+                @order.ShipLine2<br />
+            }
+            @order.ShipCity, @order.ShipRegion @order.ShipPostalCode
+        </address>
+    </section>
+    <section>
+        <h2>Details</h2>
+        <dl>
+            <dt>Customer</dt>
+            <dd>@order.Email</dd>
+            <dt>Created</dt>
+            <dd>@AdminFormat.DateTime(order.CreatedAt)</dd>
+            <dt>Paid</dt>
+            <dd>@(order.PlacedAt is null ? "Not paid" : AdminFormat.DateTime(order.PlacedAt))</dd>
+            <dt>Payment</dt>
+            <dd>@(order.PaymentProvider ?? "None") @order.PaymentReference</dd>
+        </dl>
+    </section>
+</div>

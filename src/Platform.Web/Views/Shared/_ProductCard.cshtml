@@ -1,0 +1,19 @@
+@model Product
+@inject Microsoft.Extensions.Options.IOptions<StoreOptions> Options
+
+<a class="card" asp-controller="Shop" asp-action="Product" asp-route-slug="@Model.Slug">
+    <span class="card-media">
+        @if (Model.ImageUrl is not null)
+        {
+            <img src="@Model.ImageUrl" alt="" loading="lazy" />
+        }
+    </span>
+    <span class="card-body">
+        <span class="card-name">@Model.Name</span>
+        <span class="card-spec">@Model.ShortSpec</span>
+        <span class="card-price">
+            <strong>@Money.Format(Options.Value.SubscribedPrice(Model.Price))</strong>
+            subscribed · @Money.Format(Model.Price) once
+        </span>
+    </span>
+</a>

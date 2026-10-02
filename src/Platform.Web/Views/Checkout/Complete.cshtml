@@ -1,0 +1,43 @@
+@model OrderViewModel
+@{
+    var order = Model.Order;
+    ViewData["Title"] = $"Order {order.OrderNumber}";
+}
+
+<section class="section confirmation">
+    <div><span class="badge">Order @order.OrderNumber</span></div>
+    <h1>Thanks. Your order is in.</h1>
+    <p class="muted">We'll send updates to @order.Email.</p>
+
+    <div class="summary">
+        @foreach (var item in Model.Items)
+        {
+            <div class="summary-row">
+                <div>
+                    <div>@item.Quantity × @item.ProductName</div>
+                    <div class="card-spec">@item.PlanText</div>
+                </div>
+                <strong>@Money.Format(item.LineTotal)</strong>
+            </div>
+        }
+        <hr />
+        <div class="summary-row"><span>Subtotal</span><strong>@Money.Format(order.Subtotal)</strong></div>
+        <div class="summary-row"><span>Shipping</span><span>@(order.ShippingTotal == 0 ? "Free" : Money.Format(order.ShippingTotal))</span></div>
+        <div class="summary-row"><span>Total</span><strong>@Money.Format(order.Total)</strong></div>
+    </div>
+
+    <div class="summary">
+        <h2>Shipping to</h2>
+        <address>
+            @order.ShipFullName<br />
+            @order.ShipLine1<br />
+            @if (order.ShipLine2.Length > 0)
+            {
+                @order.ShipLine2<br />
+            }
+            @order.ShipCity, @order.ShipRegion @order.ShipPostalCode
+        </address>
+    </div>
+
+    <div><a class="button" asp-controller="Shop" asp-action="Index">Continue shopping</a></div>
+</section>

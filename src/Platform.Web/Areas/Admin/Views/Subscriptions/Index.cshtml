@@ -1,0 +1,43 @@
+@model IReadOnlyList<SubscriptionRow>
+@{
+    ViewData["Title"] = "Subscriptions";
+}
+
+<div class="head">
+    <h1>Subscriptions</h1>
+</div>
+
+@if (Model.Count == 0)
+{
+    <p>No subscriptions.</p>
+}
+else
+{
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Items</th>
+                    <th>Every</th>
+                    <th>Next charge</th>
+                    <th>Status</th>
+                    <th class="num">Renewal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var subscription in Model)
+                {
+                    <tr>
+                        <td>@subscription.Email</td>
+                        <td>@subscription.Items</td>
+                        <td>@subscription.FrequencyDays days</td>
+                        <td>@AdminFormat.Date(subscription.NextChargeOn)</td>
+                        <td><span class="tag">@subscription.Status</span></td>
+                        <td class="num">@Money.Format(subscription.RenewalTotal)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
