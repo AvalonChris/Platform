@@ -15,8 +15,11 @@ main { max-width: 1100px; margin: 0 auto; padding: 24px 16px 64px; display: flex
 
 .head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
 .message { padding: 12px 16px; border: 1px solid var(--ink); border-radius: 8px; }
+.message.warning { border-color: var(--error); color: var(--error); }
 .actions { display: flex; flex-wrap: wrap; gap: 8px; }
 .actions:empty { display: none; }
+.ship-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 12px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 8px; }
+.ship-form .field { flex: 0 1 220px; }
 .filters { display: flex; flex-wrap: wrap; gap: 16px; text-transform: capitalize; }
 .filters a[aria-current="page"] { font-weight: 700; text-decoration: none; }
 
@@ -47,6 +50,14 @@ tfoot td { border-bottom: none; padding-block: 4px; }
 fieldset { margin: 0; padding: 12px 16px; border: 1px solid var(--line); border-radius: 8px; display: flex; flex-direction: column; gap: 6px; }
 .check { display: flex; align-items: center; gap: 8px; }
 .check input { width: 18px; height: 18px; margin: 0; }
+.check input.qty { width: 64px; height: auto; min-height: 36px; padding: 4px 8px; border: 1.5px solid #6B7A74; border-radius: 8px; }
+
+table input { width: 100%; min-width: 90px; min-height: 36px; padding: 4px 8px; border: 1.5px solid #6B7A74; border-radius: 8px; }
+table.profit { font-size: 14px; }
+table.profit th, table.profit td { padding: 8px; white-space: nowrap; }
+.loss { color: var(--error); }
+.missing { color: var(--muted); font-style: italic; white-space: normal !important; }
+tr.inactive td { color: var(--muted); }
 
 .columns { display: flex; flex-wrap: wrap; gap: 32px; }
 .columns section { flex: 1 1 280px; }

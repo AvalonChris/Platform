@@ -45,6 +45,9 @@ public class CheckoutViewModel
     public required string PaymentDescription { get; init; }
     public string? PaymentError { get; init; }
 
+    /// <summary>True when payment happens on a separate page after the details are submitted.</summary>
+    public bool PayOnNextStep { get; init; }
+
     public decimal Total => Cart.Subtotal + Shipping;
 }
 
@@ -68,6 +71,20 @@ public class Order
     public string? PaymentReference { get; init; }
     public DateTime CreatedAt { get; init; }
     public DateTime? PlacedAt { get; init; }
+    public string FulfillmentStatus { get; init; } = "";
+    public string? FulfillmentReference { get; init; }
+    public string? FulfillmentError { get; init; }
+    public Guid PublicToken { get; init; }
+    public DateTime? ShippedAt { get; init; }
+    public string? TrackingCarrier { get; init; }
+    public string? TrackingNumber { get; init; }
+    public decimal RefundedTotal { get; init; }
+    public DateTime? RefundedAt { get; init; }
+    public string? DisputeId { get; init; }
+    public string? DisputeStatus { get; init; }
+    public string? DisputeReason { get; init; }
+
+    public string? TrackingUrl => Tracking.UrlFor(TrackingCarrier, TrackingNumber);
 }
 
 public class OrderItem
@@ -86,13 +103,20 @@ public class OrderItem
 
 public record OrderViewModel(Order Order, IReadOnlyList<OrderItem> Items);
 
+/// <param name="AllowAlternativeFunding">
+/// Venmo and Pay Later are offered only on orders without subscriptions, because renewals need a saved PayPal
+/// account or card.
+/// </param>
+public record PaymentPageViewModel(OrderViewModel Order, Guid Token, string PayPalClientId, bool AllowAlternativeFunding);
+
+/// <summary>The states we ship to. Alaska and Hawaii are left out because Supliful can't ship there.</summary>
 public static class UsStates
 {
     public static readonly IReadOnlyList<(string Code, string Name)> All =
     [
-        ("AL", "Alabama"), ("AK", "Alaska"), ("AZ", "Arizona"), ("AR", "Arkansas"), ("CA", "California"),
+        ("AL", "Alabama"), ("AZ", "Arizona"), ("AR", "Arkansas"), ("CA", "California"),
         ("CO", "Colorado"), ("CT", "Connecticut"), ("DE", "Delaware"), ("DC", "District of Columbia"),
-        ("FL", "Florida"), ("GA", "Georgia"), ("HI", "Hawaii"), ("ID", "Idaho"), ("IL", "Illinois"),
+        ("FL", "Florida"), ("GA", "Georgia"), ("ID", "Idaho"), ("IL", "Illinois"),
         ("IN", "Indiana"), ("IA", "Iowa"), ("KS", "Kansas"), ("KY", "Kentucky"), ("LA", "Louisiana"),
         ("ME", "Maine"), ("MD", "Maryland"), ("MA", "Massachusetts"), ("MI", "Michigan"), ("MN", "Minnesota"),
         ("MS", "Mississippi"), ("MO", "Missouri"), ("MT", "Montana"), ("NE", "Nebraska"), ("NV", "Nevada"),

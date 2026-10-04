@@ -43,7 +43,8 @@ public class ProductRepository(NpgsqlDataSource dataSource)
     {
         await using var connection = await dataSource.OpenConnectionAsync();
         return await connection.QuerySingleOrDefaultAsync<Product>(
-            $"select {Columns} from products where is_active and slug = @slug", new { slug });
+            $"select {Columns}, ingredients, suggested_use, warnings from products where is_active and slug = @slug",
+            new { slug });
     }
 
     public async Task<IReadOnlyList<Product>> GetStackComponentsAsync(long stackProductId)
@@ -52,7 +53,7 @@ public class ProductRepository(NpgsqlDataSource dataSource)
         var products = await connection.QueryAsync<Product>(
             """
             select p.id, p.slug, p.sku, p.name, p.kind, p.short_spec, p.description, p.price,
-                   p.image_url, p.is_featured, p.is_new
+                   p.image_url, p.is_featured, p.is_new, si.quantity as stack_quantity
             from stack_items si
             join products p on p.id = si.component_product_id
             where si.stack_product_id = @stackProductId

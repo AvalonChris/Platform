@@ -1,0 +1,62 @@
+@inject Microsoft.Extensions.Options.IOptions<StoreOptions> Options
+@{
+    var store = Options.Value;
+    ViewData["Title"] = "Terms of service";
+}
+
+<p>These terms apply when you use this website or buy from @store.LegalName ("we", "us"). By placing an order, you agree to them.</p>
+
+<h2>Who can buy</h2>
+<p>You must be at least 18 years old and have a shipping address in a state we deliver to.</p>
+
+<h2>Our products and your health</h2>
+<p>
+    Our products are dietary supplements. They are not intended to diagnose, treat, cure, or prevent any disease, and
+    the information on this website is not medical advice. These statements have not been evaluated by the Food and Drug
+    Administration. Talk to your doctor before starting any supplement, especially if you are pregnant or nursing, take
+    medication, or have a medical condition. Follow the directions and warnings on each product's label.
+</p>
+
+<h2>Orders and prices</h2>
+<ul>
+    <li>Prices are in US dollars and shown at checkout before you pay, along with any shipping charge.</li>
+    <li>
+        Your order is accepted when we confirm it by email. If a product becomes unavailable or a price is shown in error,
+        we may cancel the order and refund you in full.
+    </li>
+    <li>Payments are processed by PayPal and are subject to PayPal's terms.</li>
+</ul>
+
+<h2>Shipping, refunds and subscriptions</h2>
+<p>
+    Delivery, our money-back guarantee and refunds are covered in <a asp-action="ShippingAndRefunds">Shipping &amp; refunds</a>.
+    Automatic renewals are covered in our <a asp-action="SubscriptionTerms">subscription terms</a>.
+</p>
+
+<h2>Your account</h2>
+<p>
+    You sign in with a one-time link sent to your email address, so keep access to your email secure. You're responsible
+    for activity in your account.
+</p>
+
+<h2>Acceptable use</h2>
+<p>Don't misuse the website, for example by trying to disrupt it, access other customers' information, or place fraudulent orders.</p>
+
+<h2>Our content</h2>
+<p>The website's text, images and branding belong to us or our licensors and may not be copied without permission.</p>
+
+<h2>Limitation of liability</h2>
+<p>
+    To the extent the law allows, our total liability for any claim relating to an order is limited to the amount you
+    paid for it, and we're not liable for indirect or consequential losses. Nothing in these terms limits rights you have
+    under consumer protection law.
+</p>
+
+<h2>Governing law</h2>
+<p>These terms are governed by the laws of the State of @store.LegalState and applicable US federal law.</p>
+
+<h2>Changes</h2>
+<p>We may update these terms. The version in effect when you place an order applies to that order.</p>
+
+<h2>Contact</h2>
+<p>@store.LegalName · @store.ContactEmail</p>

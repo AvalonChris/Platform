@@ -24,7 +24,7 @@
                 <ul>
                     @foreach (var component in Model.StackComponents)
                     {
-                        <li><a asp-action="Product" asp-route-slug="@component.Slug">@component.Name</a></li>
+                        <li>@(component.StackQuantity > 1 ? $"{component.StackQuantity} × " : "")<a asp-action="Product" asp-route-slug="@component.Slug">@component.Name</a></li>
                     }
                 </ul>
             </div>
@@ -70,6 +70,37 @@
                 <input class="qty" id="quantity" type="number" name="quantity" value="1" min="1" max="@Platform.Web.Data.CartRepository.MaxQuantity" />
                 <button class="button" type="submit">Add to cart</button>
             </div>
+            <p class="guarantee">
+                @Options.Value.GuaranteeDays-day money-back guarantee.
+                <a asp-controller="Pages" asp-action="ShippingAndRefunds">Details</a>
+            </p>
         </form>
+
+        @if (product.Ingredients.Length > 0 || product.SuggestedUse.Length > 0 || product.Warnings.Length > 0)
+        {
+            <div class="label-details">
+                @if (product.Ingredients.Length > 0)
+                {
+                    <details open>
+                        <summary>Ingredients</summary>
+                        <p>@product.Ingredients</p>
+                    </details>
+                }
+                @if (product.SuggestedUse.Length > 0)
+                {
+                    <details>
+                        <summary>Suggested use</summary>
+                        <p>@product.SuggestedUse</p>
+                    </details>
+                }
+                @if (product.Warnings.Length > 0)
+                {
+                    <details>
+                        <summary>Warnings</summary>
+                        <p>@product.Warnings</p>
+                    </details>
+                }
+            </div>
+        }
     </div>
 </section>

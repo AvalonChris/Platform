@@ -3,3 +3,5 @@ obj/
 .vs/
 *.user
 appsettings.*.local.json
+appsettings.Production.json
+App_Data/

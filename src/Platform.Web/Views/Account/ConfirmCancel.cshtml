@@ -1,0 +1,16 @@
+@model Platform.Web.Data.AccountSubscription
+@{
+    ViewData["Title"] = "Cancel subscription";
+}
+
+<section class="section account-narrow">
+    <h1>Cancel your subscription?</h1>
+    <p><strong>@Model.Items</strong>, every @Model.FrequencyDays days.</p>
+    <p class="muted">You won't be charged again. Orders you've already paid for will still ship. If you'd just like a break, you can pause instead.</p>
+    <div class="subscription-actions">
+        <form asp-action="Cancel" asp-route-id="@Model.Id" method="post">
+            <button class="button" type="submit">Cancel subscription</button>
+        </form>
+        <a class="link-button" asp-action="Index">Keep my subscription</a>
+    </div>
+</section>

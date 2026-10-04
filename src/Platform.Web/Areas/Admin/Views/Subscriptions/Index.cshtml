@@ -5,7 +5,12 @@
 
 <div class="head">
     <h1>Subscriptions</h1>
+    <form asp-action="RunRenewals" method="post">
+        <button type="submit">Run renewals now</button>
+    </form>
 </div>
+
+<p class="hint">Renewals run automatically every hour. Reminder emails go out @Platform.Web.Subscriptions.RenewalService.ReminderDaysBefore days before each renewal.</p>
 
 @if (Model.Count == 0)
 {
@@ -22,6 +27,7 @@ else
                     <th>Every</th>
                     <th>Next charge</th>
                     <th>Status</th>
+                    <th>Payment</th>
                     <th class="num">Renewal</th>
                 </tr>
             </thead>
@@ -33,7 +39,24 @@ else
                         <td>@subscription.Items</td>
                         <td>@subscription.FrequencyDays days</td>
                         <td>@AdminFormat.Date(subscription.NextChargeOn)</td>
-                        <td><span class="tag">@subscription.Status</span></td>
+                        <td>
+                            <span class="tag">@subscription.Status</span>
+                            @if (subscription.FailedAttempts > 0)
+                            {
+                                <div class="error">@subscription.FailedAttempts failed: @subscription.LastFailure</div>
+                            }
+                        </td>
+                        <td>
+                            @subscription.PaymentProvider
+                            @if (subscription.HasSavedMethod)
+                            {
+                                <span>(saved @(subscription.PaymentMethodType ?? "method"))</span>
+                            }
+                            else
+                            {
+                                <span class="error">no saved method</span>
+                            }
+                        </td>
                         <td class="num">@Money.Format(subscription.RenewalTotal)</td>
                     </tr>
                 }

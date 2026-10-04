@@ -57,6 +57,22 @@
         <textarea asp-for="Form.Description" rows="5"></textarea>
     </div>
 
+    <div class="field">
+        <label asp-for="Form.Ingredients">Ingredients</label>
+        <textarea asp-for="Form.Ingredients" rows="3"></textarea>
+        <span class="hint">As on the label, for example "β-Nicotinamide Mononucleotide (500 mg), HPMC (vegetable capsule), …". Leave blank for stacks; their pages link to each product.</span>
+    </div>
+
+    <div class="field">
+        <label asp-for="Form.SuggestedUse">Suggested use</label>
+        <textarea asp-for="Form.SuggestedUse" rows="3"></textarea>
+    </div>
+
+    <div class="field">
+        <label asp-for="Form.Warnings">Warnings</label>
+        <textarea asp-for="Form.Warnings" rows="3"></textarea>
+    </div>
+
     <div class="row">
         <div class="field">
             <label asp-for="Form.Price">Price (USD)</label>
@@ -81,6 +97,39 @@
         <span class="error" asp-validation-for="Form.ImageUrl"></span>
     </div>
 
+    @if (!Model.Form.IsStack)
+    {
+        <fieldset>
+            <legend>Supplier costs</legend>
+            <span class="hint">
+                Used by the profit report. Check them against Supliful from time to time.
+                @(Model.Form.CostsUpdatedAt is null ? "Not set yet." : $"Last changed {AdminFormat.DateTime(Model.Form.CostsUpdatedAt)}.")
+                @(Model.IsNew ? " Not used for stacks, which take their costs from their contents." : "")
+            </span>
+            <div class="row">
+                <div class="field">
+                    <label asp-for="Form.SupplierCost">Supplier cost per unit (USD)</label>
+                    <input asp-for="Form.SupplierCost" type="number" step="0.01" min="0" />
+                    <span class="hint">Supliful's on-demand price for your plan and volume tier.</span>
+                    <span class="error" asp-validation-for="Form.SupplierCost"></span>
+                </div>
+                <div class="field">
+                    <label asp-for="Form.ShippingWeightLb">Shipping weight (lb)</label>
+                    <input asp-for="Form.ShippingWeightLb" type="number" step="0.001" min="0" />
+                    <span class="hint">Gross weight from the product page.</span>
+                    <span class="error" asp-validation-for="Form.ShippingWeightLb"></span>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="field">
+            <label asp-for="Form.FulfillmentVariantId">Fulfilment variant ID (Shopify)</label>
+            <input asp-for="Form.FulfillmentVariantId" />
+            <span class="hint">The Shopify variant ID of the matching Supliful product. Orders containing this product can't be sent for fulfilment without it.@(Model.IsNew ? " Not used for stacks, which ship as their contents." : "")</span>
+            <span class="error" asp-validation-for="Form.FulfillmentVariantId"></span>
+        </div>
+    }
+
     <fieldset>
         <legend>Visibility</legend>
         <label class="check"><input asp-for="Form.IsActive" /> Active (visible in the store)</label>
@@ -96,13 +145,15 @@
             {
                 <span class="hint">Only used when the kind is Stack.</span>
             }
+            <span class="hint">How many of each product the stack contains. Leave at 0 to leave it out.</span>
             @foreach (var single in Model.Singles)
             {
                 <label class="check">
-                    <input type="checkbox" name="Form.ComponentIds" value="@single.Id" checked="@Model.Form.ComponentIds.Contains(single.Id)" />
+                    <input class="qty" type="number" name="Form.ComponentQuantities[@single.Id]" value="@Model.Form.QuantityOf(single.Id)" min="0" max="@ProductForm.MaxComponentQuantity" aria-label="Quantity of @single.Name" />
                     @single.Name
                 </label>
             }
+            <span class="error" asp-validation-for="Form.ComponentQuantities"></span>
         </fieldset>
     }
 

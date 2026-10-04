@@ -9,11 +9,46 @@
     <a asp-action="Index">Back to orders</a>
 </div>
 
+@if (order.DisputeStatus is not null)
+{
+    <div class="message @(order.DisputeStatus == "RESOLVED" ? null : "warning")">
+        PayPal dispute @order.DisputeId: <strong>@order.DisputeStatus</strong>@(order.DisputeReason is null ? "" : $" ({order.DisputeReason})").
+        @if (order.DisputeStatus != "RESOLVED")
+        {
+            <span>Respond to it in your PayPal account's Resolution Center.</span>
+        }
+    </div>
+}
+@if (order.RefundedTotal > 0)
+{
+    <div class="message">
+        @Money.Format(order.RefundedTotal) of @Money.Format(order.Total) refunded in PayPal@(order.RefundedAt is null ? "" : " on " + AdminFormat.DateTime(order.RefundedAt)).
+        @if (order.FulfillmentStatus == "sent" && order.ShippedAt is null)
+        {
+            <span>This order was already sent to Shopify for fulfilment; cancel it there if it hasn't shipped.</span>
+        }
+    </div>
+}
+
 <div class="actions">
     @if (order.Status == "paid")
     {
-        <form asp-action="Fulfill" asp-route-id="@order.Id" method="post">
-            <button class="primary" type="submit">Mark as fulfilled</button>
+        <form class="ship-form" asp-action="Ship" asp-route-id="@order.Id" method="post">
+            <div class="field">
+                <label for="carrier">Carrier</label>
+                <select id="carrier" name="carrier">
+                    @foreach (var carrier in Tracking.Carriers)
+                    {
+                        <option value="@carrier">@carrier</option>
+                    }
+                </select>
+            </div>
+            <div class="field">
+                <label for="trackingNumber">Tracking number (optional)</label>
+                <input id="trackingNumber" name="trackingNumber" autocomplete="off" />
+            </div>
+            <label class="check"><input type="checkbox" name="notifyCustomer" value="true" checked /> Email the customer</label>
+            <button class="primary" type="submit">Mark as shipped</button>
         </form>
     }
     @if (order.Status is "pending" or "paid")
@@ -80,6 +115,53 @@
             <dd>@(order.PlacedAt is null ? "Not paid" : AdminFormat.DateTime(order.PlacedAt))</dd>
             <dt>Payment</dt>
             <dd>@(order.PaymentProvider ?? "None") @order.PaymentReference</dd>
+            @if (order.ShippedAt is not null)
+            {
+                <dt>Shipped</dt>
+                <dd>@AdminFormat.DateTime(order.ShippedAt)</dd>
+            }
+            @if (order.TrackingNumber is not null)
+            {
+                <dt>Tracking</dt>
+                <dd>
+                    @order.TrackingCarrier
+                    @if (order.TrackingUrl is not null)
+                    {
+                        <a href="@order.TrackingUrl" target="_blank" rel="noopener">@order.TrackingNumber</a>
+                    }
+                    else
+                    {
+                        @order.TrackingNumber
+                    }
+                </dd>
+            }
         </dl>
+    </section>
+    <section>
+        <h2>Fulfilment</h2>
+        <dl>
+            <dt>Status</dt>
+            <dd><span class="tag">@order.FulfillmentStatus.Replace('_', ' ')</span></dd>
+            @if (order.FulfillmentReference is not null)
+            {
+                <dt>Shopify order</dt>
+                <dd>@order.FulfillmentReference</dd>
+            }
+            @if (order.FulfillmentError is not null)
+            {
+                <dt>Note</dt>
+                <dd>@order.FulfillmentError</dd>
+            }
+        </dl>
+        @if (order.Status == "paid" && order.FulfillmentStatus is "failed" or "skipped")
+        {
+            <form asp-action="Resend" asp-route-id="@order.Id" method="post">
+                <button type="submit">Send for fulfilment again</button>
+            </form>
+        }
+        @if (order.FulfillmentStatus == "sent" && order.Status == "cancelled")
+        {
+            <p class="error">This order was already sent to Shopify. Cancel it there too, or Supliful will still ship it.</p>
+        }
     </section>
 </div>

@@ -9,7 +9,8 @@ public class AdminProductRepository(NpgsqlDataSource dataSource)
     private const string Columns =
         """
         id, slug, sku, name, kind, short_spec, description, price, image_url,
-        stock_quantity, sort_order, is_active, is_featured, is_new
+        stock_quantity, sort_order, is_active, is_featured, is_new, fulfillment_variant_id,
+        ingredients, suggested_use, warnings, supplier_cost, shipping_weight_lb, costs_updated_at
         """;
 
     public async Task<IReadOnlyList<ProductForm>> ListAsync()
@@ -28,9 +29,9 @@ public class AdminProductRepository(NpgsqlDataSource dataSource)
         if (product is null)
             return null;
 
-        var componentIds = await connection.QueryAsync<long>(
-            "select component_product_id from stack_items where stack_product_id = @id", new { id });
-        product.ComponentIds = componentIds.AsList();
+        var components = await connection.QueryAsync<(long ProductId, int Quantity)>(
+            "select component_product_id, quantity from stack_items where stack_product_id = @id", new { id });
+        product.ComponentQuantities = components.ToDictionary(c => c.ProductId, c => c.Quantity);
         return product;
     }
 
@@ -42,9 +43,13 @@ public class AdminProductRepository(NpgsqlDataSource dataSource)
         var id = await connection.ExecuteScalarAsync<long>(
             """
             insert into products (slug, sku, name, kind, short_spec, description, price, image_url,
-                                  stock_quantity, sort_order, is_active, is_featured, is_new)
+                                  stock_quantity, sort_order, is_active, is_featured, is_new, fulfillment_variant_id,
+                                  ingredients, suggested_use, warnings, supplier_cost, shipping_weight_lb,
+                                  costs_updated_at)
             values (@Slug, @Sku, @Name, @Kind, @ShortSpec, @Description, @Price, @ImageUrl,
-                    @StockQuantity, @SortOrder, @IsActive, @IsFeatured, @IsNew)
+                    @StockQuantity, @SortOrder, @IsActive, @IsFeatured, @IsNew, @FulfillmentVariantId,
+                    @Ingredients, @SuggestedUse, @Warnings, @SupplierCost, @ShippingWeightLb,
+                    case when @SupplierCost is not null or @ShippingWeightLb is not null then now() end)
             returning id
             """,
             Parameters(form), transaction);
@@ -65,7 +70,15 @@ public class AdminProductRepository(NpgsqlDataSource dataSource)
             update products
             set slug = @Slug, sku = @Sku, name = @Name, short_spec = @ShortSpec, description = @Description,
                 price = @Price, image_url = @ImageUrl, stock_quantity = @StockQuantity, sort_order = @SortOrder,
-                is_active = @IsActive, is_featured = @IsFeatured, is_new = @IsNew, updated_at = now()
+                is_active = @IsActive, is_featured = @IsFeatured, is_new = @IsNew,
+                fulfillment_variant_id = @FulfillmentVariantId, ingredients = @Ingredients,
+                suggested_use = @SuggestedUse, warnings = @Warnings,
+                costs_updated_at = case
+                    when supplier_cost is distinct from @SupplierCost
+                      or shipping_weight_lb is distinct from @ShippingWeightLb then now()
+                    else costs_updated_at
+                end,
+                supplier_cost = @SupplierCost, shipping_weight_lb = @ShippingWeightLb, updated_at = now()
             where id = @Id
             """,
             Parameters(form), transaction);
@@ -83,13 +96,25 @@ public class AdminProductRepository(NpgsqlDataSource dataSource)
         form.Kind,
         ShortSpec = form.ShortSpec ?? "",
         Description = form.Description ?? "",
+        Ingredients = form.Ingredients?.Trim() ?? "",
+        SuggestedUse = form.SuggestedUse?.Trim() ?? "",
+        Warnings = form.Warnings?.Trim() ?? "",
+        // Stacks take their costs from their contents.
+        SupplierCost = form.IsStack ? null : form.SupplierCost,
+        ShippingWeightLb = form.IsStack ? null : form.ShippingWeightLb,
         form.Price,
         ImageUrl = string.IsNullOrWhiteSpace(form.ImageUrl) ? null : form.ImageUrl.Trim(),
         form.StockQuantity,
         form.SortOrder,
         form.IsActive,
         form.IsFeatured,
-        form.IsNew
+        form.IsNew,
+        // Stacks ship as their components, so they never carry a variant of their own.
+        FulfillmentVariantId = form.IsStack || string.IsNullOrWhiteSpace(form.FulfillmentVariantId)
+            ? null
+            : form.FulfillmentVariantId.Trim().StartsWith("gid://")
+                ? form.FulfillmentVariantId.Trim()
+                : $"gid://shopify/ProductVariant/{form.FulfillmentVariantId.Trim()}"
     };
 
     private static async Task SaveComponentsAsync(
@@ -101,11 +126,21 @@ public class AdminProductRepository(NpgsqlDataSource dataSource)
         await connection.ExecuteAsync(
             "delete from stack_items where stack_product_id = @productId", new { productId }, transaction);
 
+        var included = form.ComponentQuantities.Where(c => c.Value > 0).ToList();
+
         await connection.ExecuteAsync(
             """
-            insert into stack_items (stack_product_id, component_product_id)
-            select @productId, id from products where id = any(@ComponentIds) and kind = 'single'
+            insert into stack_items (stack_product_id, component_product_id, quantity)
+            select @productId, p.id, c.quantity
+            from unnest(@ids, @quantities) as c (id, quantity)
+            join products p on p.id = c.id and p.kind = 'single'
             """,
-            new { productId, form.ComponentIds }, transaction);
+            new
+            {
+                productId,
+                ids = included.Select(c => c.Key).ToArray(),
+                quantities = included.Select(c => c.Value).ToArray()
+            },
+            transaction);
     }
 }

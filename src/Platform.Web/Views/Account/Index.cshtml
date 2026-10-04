@@ -1,0 +1,127 @@
+@model AccountViewModel
+@using Platform.Web.Data
+@{
+    ViewData["Title"] = "Your account";
+}
+
+<section class="section">
+    <div class="section-head">
+        <h1>Your account</h1>
+        <form asp-action="LogOut" method="post">
+            <button class="link-button" type="submit">Sign out</button>
+        </form>
+    </div>
+    <p class="muted">Signed in as @Model.Email</p>
+
+    @if (TempData["AccountMessage"] is string message)
+    {
+        <div class="notice" role="status">@message</div>
+    }
+</section>
+
+<section class="section">
+    <h2>Subscriptions</h2>
+    @if (Model.Subscriptions.Count == 0)
+    {
+        <p class="muted">You don't have any subscriptions.</p>
+    }
+    <div class="account-list">
+        @foreach (var subscription in Model.Subscriptions)
+        {
+            var total = subscription.Subtotal + Model.Store.ShippingFor(subscription.Subtotal);
+            <article class="panel subscription">
+                <div class="subscription-head">
+                    <strong>@subscription.Items</strong>
+                    <span class="status-tag status-@subscription.Status">@subscription.Status</span>
+                </div>
+                <div class="muted">
+                    Every @subscription.FrequencyDays days · @Money.Format(total) each time · paid with your saved
+                    @(subscription.PaymentMethodType == "card" ? "card" : "PayPal account")
+                </div>
+
+                @if (subscription.Status == "active")
+                {
+                    <div>Next delivery charged on <strong>@subscription.NextChargeOn?.ToString("MMMM d, yyyy")</strong></div>
+                    @if (subscription.FailedAttempts > 0)
+                    {
+                        <div class="field-error">Your last payment didn't go through. We'll try again shortly.</div>
+                    }
+                    <div class="subscription-actions">
+                        <form asp-action="Skip" asp-route-id="@subscription.Id" method="post">
+                            <button class="pill" type="submit">Skip next delivery</button>
+                        </form>
+                        <form asp-action="Pause" asp-route-id="@subscription.Id" method="post">
+                            <button class="pill" type="submit">Pause</button>
+                        </form>
+                        <a class="link-button" asp-action="ConfirmCancel" asp-route-id="@subscription.Id">Cancel subscription</a>
+                    </div>
+                }
+                else if (subscription.Status == "paused")
+                {
+                    <div>
+                        Paused. Nothing will be charged until you resume.
+                        @if (subscription.LastFailure is not null)
+                        {
+                            <span>We paused it because your saved payment method couldn't be charged.</span>
+                        }
+                    </div>
+                    <div class="subscription-actions">
+                        <form asp-action="Resume" asp-route-id="@subscription.Id" method="post">
+                            <button class="button" type="submit">Resume subscription</button>
+                        </form>
+                        <a class="link-button" asp-action="ConfirmCancel" asp-route-id="@subscription.Id">Cancel subscription</a>
+                    </div>
+                }
+
+                @if (subscription.Status is "active" or "paused")
+                {
+                    <form class="frequency-form" asp-action="ChangeFrequency" asp-route-id="@subscription.Id" method="post">
+                        <label for="frequency-@subscription.Id">Deliver every</label>
+                        <select id="frequency-@subscription.Id" name="frequencyDays">
+                            @foreach (var days in CustomerAccountRepository.Frequencies)
+                            {
+                                <option value="@days" selected="@(days == subscription.FrequencyDays)">@days days</option>
+                            }
+                        </select>
+                        <button class="link-button" type="submit">Update</button>
+                    </form>
+                }
+            </article>
+        }
+    </div>
+</section>
+
+<section class="section">
+    <h2>Orders</h2>
+    @if (Model.Orders.Count == 0)
+    {
+        <p class="muted">No orders yet.</p>
+    }
+    else
+    {
+        <div class="table-wrap">
+            <table class="orders-table">
+                <thead>
+                    <tr><th>Order</th><th>Date</th><th>Status</th><th class="num">Total</th></tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model.Orders)
+                    {
+                        <tr>
+                            <td>
+                                <a asp-controller="Checkout" asp-action="Complete" asp-route-token="@order.PublicToken">@order.OrderNumber</a>
+                                @if (order.IsRenewal)
+                                {
+                                    <span class="muted">(renewal)</span>
+                                }
+                            </td>
+                            <td>@order.CreatedAt.ToString("MMM d, yyyy")</td>
+                            <td>@(order.Status == "fulfilled" ? "shipped" : order.Status)</td>
+                            <td class="num">@Money.Format(order.Total)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</section>

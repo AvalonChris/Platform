@@ -1,0 +1,18 @@
+@model SignInForm
+@{
+    ViewData["Title"] = "Sign in";
+}
+
+<section class="section account-narrow">
+    <h1>Sign in</h1>
+    <p class="muted">Enter the email address you used at checkout and we'll email you a link to sign in. No password needed.</p>
+
+    <form class="checkout-form" asp-action="SendSignInLink" method="post">
+        <div class="field">
+            <label asp-for="Email">Email</label>
+            <input asp-for="Email" type="email" autocomplete="email" required autofocus />
+            <span class="field-error" asp-validation-for="Email"></span>
+        </div>
+        <button class="button" type="submit">Email me a sign-in link</button>
+    </form>
+</section>

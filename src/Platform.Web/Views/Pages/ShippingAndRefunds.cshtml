@@ -1,0 +1,52 @@
+@inject Microsoft.Extensions.Options.IOptions<StoreOptions> Options
+@{
+    var store = Options.Value;
+    ViewData["Title"] = "Shipping & refunds";
+}
+
+<h2>Where we ship</h2>
+<p>We ship to addresses in the United States, except Alaska, Hawaii and US territories.</p>
+
+<h2>Delivery times</h2>
+<p>
+    Orders are packed and shipped by our fulfilment partner and sent by USPS. Most orders arrive within 5–7 business
+    days of being placed. You'll get an email with tracking details when your order ships.
+</p>
+
+<h2>Shipping costs</h2>
+<p>Any shipping charge is shown at checkout before you pay.</p>
+
+<h2>@store.GuaranteeDays-day money-back guarantee</h2>
+<p>
+    If you're not happy with a product, email us at @store.ContactEmail within @store.GuaranteeDays days of delivery and
+    we'll refund it. You don't need to send anything back.
+</p>
+<ul>
+    <li>The guarantee covers your first purchase of each product.</li>
+    <li>Refunds go back to the original payment method (your PayPal account or card).</li>
+    <li>We process refunds within 3 business days of your request. Your bank or PayPal may take a few more days to show it.</li>
+</ul>
+
+<h2>Damaged, wrong or missing orders</h2>
+<p>
+    If your order arrives damaged, contains the wrong item, or hasn't arrived 10 business days after it shipped, email us
+    within @store.GuaranteeDays days. We'll send a replacement or give you a full refund, whichever you prefer. This applies
+    to every order, including subscription renewals.
+</p>
+
+<h2>Subscription renewals</h2>
+<p>
+    Renewal orders are covered for damaged, wrong or missing items as above. If you meant to cancel before a renewal,
+    email us before the renewal order ships and we'll cancel and refund it. You can always skip, pause or cancel future
+    renewals yourself from <a asp-controller="Account" asp-action="Index">your account</a>. See our
+    <a asp-action="SubscriptionTerms">subscription terms</a> for details.
+</p>
+
+<h2>Returns</h2>
+<p>
+    Because supplements are consumable and we refund without asking for products back, we don't accept returns. Please
+    don't post items back to us, as there's no address to receive them.
+</p>
+
+<h2>Questions</h2>
+<p>Email @store.ContactEmail and we'll get back to you within 2 business days.</p>

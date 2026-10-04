@@ -2,8 +2,18 @@ namespace Platform.Web.Payments;
 
 public record PaymentRequest(string OrderNumber, string Email, decimal Amount, string Currency);
 
-public record PaymentResult(bool Approved, string Provider, string? Reference, string? Error);
+/// <param name="Reference">The provider's id for this payment.</param>
+/// <param name="PaymentMethodReference">A saved payment method for charging subscription renewals, when one was saved.</param>
+/// <param name="PaymentMethodType">What kind of saved payment method it is: "paypal" or "card".</param>
+public record PaymentResult(
+    bool Approved,
+    string Provider,
+    string? Reference,
+    string? Error,
+    string? PaymentMethodReference = null,
+    string? PaymentMethodType = null);
 
+/// <summary>A payment taken in one step on our server. PayPal is handled separately because the customer approves it in the browser.</summary>
 public interface IPaymentGateway
 {
     /// <summary>Shown in the payment section of the checkout page.</summary>
@@ -21,7 +31,7 @@ public class TestPaymentGateway : IPaymentGateway
         Task.FromResult(new PaymentResult(true, "test", $"test-{Guid.NewGuid():N}", null));
 }
 
-/// <summary>Used outside development until a real processor is integrated: declines every payment.</summary>
+/// <summary>Used outside development when no payment provider is configured: declines every payment.</summary>
 public class UnconfiguredPaymentGateway : IPaymentGateway
 {
     public string Description => "Online payment is not available yet.";

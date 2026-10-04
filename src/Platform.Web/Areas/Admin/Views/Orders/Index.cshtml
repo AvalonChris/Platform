@@ -39,7 +39,17 @@ else
                         <td><a asp-action="Detail" asp-route-id="@order.Id">@order.OrderNumber</a></td>
                         <td>@AdminFormat.DateTime(order.CreatedAt)</td>
                         <td>@order.Email</td>
-                        <td><span class="tag">@order.Status</span></td>
+                        <td>
+                            <span class="tag">@order.Status</span>
+                            @if (order.DisputeStatus is not null && order.DisputeStatus != "RESOLVED")
+                            {
+                                <span class="tag off">Dispute</span>
+                            }
+                            @if (order.RefundedTotal > 0 && order.Status != "refunded")
+                            {
+                                <span class="tag">Part refunded</span>
+                            }
+                        </td>
                         <td class="num">@Money.Format(order.Total)</td>
                     </tr>
                 }

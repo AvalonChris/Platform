@@ -9,6 +9,27 @@
     <h1>Thanks. Your order is in.</h1>
     <p class="muted">We'll send updates to @order.Email.</p>
 
+    @if (order.ShippedAt is not null)
+    {
+        <div class="notice">
+            Shipped on @order.ShippedAt.Value.ToString("MMMM d").
+            @if (order.TrackingNumber is not null)
+            {
+                <span>
+                    Tracking: @order.TrackingCarrier
+                    @if (order.TrackingUrl is not null)
+                    {
+                        <a href="@order.TrackingUrl" target="_blank" rel="noopener">@order.TrackingNumber</a>
+                    }
+                    else
+                    {
+                        @order.TrackingNumber
+                    }
+                </span>
+            }
+        </div>
+    }
+
     <div class="summary">
         @foreach (var item in Model.Items)
         {

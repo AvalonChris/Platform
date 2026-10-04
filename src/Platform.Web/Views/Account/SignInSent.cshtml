@@ -1,0 +1,17 @@
+@model string
+@using Microsoft.Extensions.Hosting
+@inject IHostEnvironment Environment
+@{
+    ViewData["Title"] = "Check your email";
+}
+
+<section class="section account-narrow">
+    <h1>Check your email</h1>
+    <p>If we have an order under <strong>@Model</strong>, we've sent a sign-in link to that address. It works once and expires in 30 minutes.</p>
+    <p class="muted">Nothing arrived? Check your spam folder, or <a asp-action="SignInForm">try again</a>.</p>
+
+    @if (Environment.IsDevelopment())
+    {
+        <p class="muted">Development: emails are saved under App_Data/emails in the project instead of being sent.</p>
+    }
+</section>

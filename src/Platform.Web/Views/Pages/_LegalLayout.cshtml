@@ -1,0 +1,13 @@
+@inject Microsoft.Extensions.Options.IOptions<StoreOptions> Options
+@{
+    Layout = "_Layout";
+}
+
+<article class="section legal">
+    <h1>@ViewData["Title"]</h1>
+    @if (ViewData["ShowUpdated"] is not false)
+    {
+        <p class="muted">Last updated @Options.Value.PoliciesUpdated</p>
+    }
+    @RenderBody()
+</article>

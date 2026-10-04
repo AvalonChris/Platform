@@ -12,7 +12,7 @@ public class AdminOrderRepository(NpgsqlDataSource dataSource)
         await using var connection = await dataSource.OpenConnectionAsync();
         var orders = await connection.QueryAsync<Order>(
             """
-            select id, order_number, email, status, total, created_at, placed_at
+            select id, order_number, email, status, total, created_at, placed_at, refunded_total, dispute_status
             from orders
             where @status::text is null or status = @status
             order by id desc
@@ -30,7 +30,10 @@ public class AdminOrderRepository(NpgsqlDataSource dataSource)
             """
             select id, order_number, email, status, ship_full_name, ship_line1, ship_line2, ship_city,
                    ship_region, ship_postal_code, subtotal, shipping_total, tax_total, total,
-                   payment_provider, payment_reference, created_at, placed_at
+                   payment_provider, payment_reference, created_at, placed_at,
+                   fulfillment_status, fulfillment_reference, fulfillment_error,
+                   public_token, shipped_at, tracking_carrier, tracking_number,
+                   refunded_total, refunded_at, dispute_id, dispute_status, dispute_reason
             from orders
             where id = @id
             """,
@@ -50,12 +53,17 @@ public class AdminOrderRepository(NpgsqlDataSource dataSource)
         return new OrderViewModel(order, items.AsList());
     }
 
-    /// <summary>Returns false if the order was not in the expected status.</summary>
-    public async Task<bool> MarkFulfilledAsync(long id)
+    /// <summary>Marks a paid order as shipped, with optional tracking. Returns false if it wasn't paid.</summary>
+    public async Task<bool> MarkShippedAsync(long id, string? carrier, string? trackingNumber)
     {
         await using var connection = await dataSource.OpenConnectionAsync();
         return await connection.ExecuteAsync(
-            "update orders set status = 'fulfilled' where id = @id and status = 'paid'", new { id }) > 0;
+            """
+            update orders
+            set status = 'fulfilled', shipped_at = now(), tracking_carrier = @carrier, tracking_number = @trackingNumber
+            where id = @id and status = 'paid'
+            """,
+            new { id, carrier, trackingNumber }) > 0;
     }
 
     /// <summary>Cancels an unshipped order and any subscriptions it started. Does not refund.</summary>
@@ -88,6 +96,8 @@ public class AdminOrderRepository(NpgsqlDataSource dataSource)
         var subscriptions = await connection.QueryAsync<SubscriptionRow>(
             """
             select s.id, c.email, s.status, s.frequency_days, s.next_charge_on, s.created_at,
+                   s.payment_provider, s.payment_method_type, s.payment_method_reference is not null as has_saved_method,
+                   s.failed_attempts, s.last_failure,
                    string_agg(si.quantity || ' × ' || p.name, ', ' order by p.name) as items,
                    sum(si.quantity * si.unit_price) as renewal_total
             from subscriptions s

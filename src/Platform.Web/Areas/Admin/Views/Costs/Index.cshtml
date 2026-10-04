@@ -1,0 +1,88 @@
+@model CostSettingsViewModel
+@{
+    ViewData["Title"] = "Costs";
+}
+
+<div class="head">
+    <h1>Costs</h1>
+    <a asp-action="Profit">View profit report</a>
+</div>
+
+<p class="hint">
+    Rates used by the profit report. Update them whenever Supliful or your payment processor changes its fees.
+    Each product's own supplier cost and shipping weight are set on its product page.
+    @if (Model.Settings.UpdatedAt != default)
+    {
+        <text>Last saved @AdminFormat.DateTime(Model.Settings.UpdatedAt).</text>
+    }
+</p>
+
+<form class="form" asp-action="Save" method="post">
+    <fieldset>
+        <legend>Supplier (Supliful)</legend>
+        <div class="row">
+            <div class="field">
+                <label asp-for="Settings.FulfillmentFirstUnit">Fulfilment fee, first unit of each product ($)</label>
+                <input asp-for="Settings.FulfillmentFirstUnit" type="number" step="0.01" min="0" required />
+                <span class="error" asp-validation-for="Settings.FulfillmentFirstUnit"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Settings.FulfillmentAdditionalUnit">Fulfilment fee, each extra unit ($)</label>
+                <input asp-for="Settings.FulfillmentAdditionalUnit" type="number" step="0.01" min="0" required />
+                <span class="error" asp-validation-for="Settings.FulfillmentAdditionalUnit"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Settings.SupplierProcessingPercent">Processing fee (%)</label>
+                <input asp-for="Settings.SupplierProcessingPercent" type="number" step="0.001" min="0" max="100" required />
+                <span class="hint">Charged on product, fulfilment and shipping.</span>
+                <span class="error" asp-validation-for="Settings.SupplierProcessingPercent"></span>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Supplier shipping</legend>
+        <span class="hint">Price for a package weighing up to each weight. Leave a row empty to remove it.</span>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Up to (lb)</th><th>Price ($)</th></tr>
+                </thead>
+                <tbody>
+                    @for (var i = 0; i < Model.ShippingRates.Count; i++)
+                    {
+                        <tr>
+                            <td><input asp-for="ShippingRates[i].MaxWeightLb" type="number" step="0.001" min="0" aria-label="Shipping row @(i + 1) weight" /></td>
+                            <td><input asp-for="ShippingRates[i].Rate" type="number" step="0.01" min="0" aria-label="Shipping row @(i + 1) price" /></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <span class="error" asp-validation-for="ShippingRates"></span>
+        <div class="field">
+            <label asp-for="Settings.ShippingExtraLbRate">Each pound above the heaviest row ($)</label>
+            <input asp-for="Settings.ShippingExtraLbRate" type="number" step="0.01" min="0" required />
+            <span class="error" asp-validation-for="Settings.ShippingExtraLbRate"></span>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Your card processing</legend>
+        <span class="hint">What your payment processor charges per customer payment. Placeholder until one is chosen.</span>
+        <div class="row">
+            <div class="field">
+                <label asp-for="Settings.CardProcessingPercent">Percentage (%)</label>
+                <input asp-for="Settings.CardProcessingPercent" type="number" step="0.001" min="0" max="100" required />
+                <span class="error" asp-validation-for="Settings.CardProcessingPercent"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Settings.CardProcessingFixed">Fixed fee per payment ($)</label>
+                <input asp-for="Settings.CardProcessingFixed" type="number" step="0.01" min="0" required />
+                <span class="error" asp-validation-for="Settings.CardProcessingFixed"></span>
+            </div>
+        </div>
+    </fieldset>
+
+    <div><button class="primary" type="submit">Save costs</button></div>
+</form>

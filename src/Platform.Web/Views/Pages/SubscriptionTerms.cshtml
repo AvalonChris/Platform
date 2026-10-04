@@ -1,0 +1,54 @@
+@inject Microsoft.Extensions.Options.IOptions<StoreOptions> Options
+@{
+    var store = Options.Value;
+    ViewData["Title"] = "Subscription terms";
+}
+
+<p>These terms apply when you choose <strong>Subscribe</strong> for a product. They form part of our <a asp-action="Terms">terms of service</a>.</p>
+
+<h2>How it works</h2>
+<ul>
+    <li>Subscription items cost @store.SubscriptionDiscountPercent% less than buying them one at a time.</li>
+    <li>You choose how often each item is delivered: every 30, 60 or 90 days.</li>
+    <li>
+        Your subscription renews automatically at the price shown at checkout, plus any shipping charge shown there, until
+        you cancel. We charge the payment method you used at checkout (your PayPal account or card), which PayPal stores
+        securely for this purpose.
+    </li>
+    <li>Each renewal is charged on its renewal date and shipped as a new order.</li>
+</ul>
+
+<h2>Reminders</h2>
+<p>
+    We email you 3 days before every renewal with the date, the items and the amount, so you have time to make changes.
+    You'll also get an email receipt each time a renewal is charged.
+</p>
+
+<h2>Skipping, pausing, changing and cancelling</h2>
+<p>
+    You can do all of these yourself at any time from <a asp-controller="Account" asp-action="Index">your account</a>.
+    Sign in with your email address; we'll send you a sign-in link, no password needed. You can also email us at
+    @store.ContactEmail.
+</p>
+<ul>
+    <li><strong>Skip</strong> moves your next renewal back by one delivery period.</li>
+    <li><strong>Pause</strong> stops renewals until you resume.</li>
+    <li><strong>Change frequency</strong> switches between every 30, 60 or 90 days.</li>
+    <li><strong>Cancel</strong> takes effect immediately and stops all future charges. There's no cancellation fee.</li>
+</ul>
+<p>
+    Orders already charged before you cancel will still ship. If you meant to cancel before a renewal, email us before
+    that order ships and we'll cancel and refund it.
+</p>
+
+<h2>If a payment fails</h2>
+<p>
+    If we can't charge your payment method on the renewal date, we'll email you and try again 2 days later. After 3
+    unsuccessful attempts we pause your subscription and let you know. Nothing more is charged until you resume it.
+</p>
+
+<h2>Changes to these terms</h2>
+<p>
+    If we change these terms in a way that affects your subscription, we'll email you before the change applies to your
+    next renewal.
+</p>

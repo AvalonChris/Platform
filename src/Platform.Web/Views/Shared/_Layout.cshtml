@@ -21,7 +21,10 @@
                 <a asp-controller="Shop" asp-action="Index" asp-route-kind="@Product.KindStack">Stacks</a>
             </nav>
             <a class="site-logo" asp-controller="Home" asp-action="Index">@brand</a>
-            <div class="site-header-end">@await Component.InvokeAsync("CartLink")</div>
+            <div class="site-header-end">
+                <a class="account-link" asp-controller="Account" asp-action="Index">Account</a>
+                @await Component.InvokeAsync("CartLink")
+            </div>
         </div>
     </header>
 
@@ -32,8 +35,18 @@
     <footer class="site-footer">
         <div class="container">
             <div class="site-footer-brand">@brand</div>
+            <nav aria-label="Policies" class="site-footer-links">
+                <a asp-controller="Pages" asp-action="ShippingAndRefunds">Shipping &amp; refunds</a>
+                <a asp-controller="Pages" asp-action="SubscriptionTerms">Subscription terms</a>
+                <a asp-controller="Pages" asp-action="Privacy">Privacy</a>
+                <a asp-controller="Pages" asp-action="Terms">Terms</a>
+                <a asp-controller="Pages" asp-action="Contact">Contact</a>
+            </nav>
             <p>These statements have not been evaluated by the Food and Drug Administration. This product is not intended to diagnose, treat, cure, or prevent any disease.</p>
+            <p>© @DateTime.UtcNow.Year @Options.Value.LegalName · @Options.Value.ContactEmail</p>
         </div>
     </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

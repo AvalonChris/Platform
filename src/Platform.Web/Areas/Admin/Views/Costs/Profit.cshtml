@@ -1,0 +1,76 @@
+@model ProfitReportViewModel
+@{
+    ViewData["Title"] = "Profit";
+    var settings = Model.Settings;
+}
+
+<div class="head">
+    <h1>Profit per order</h1>
+    <a asp-action="Index">Edit cost rates</a>
+</div>
+
+<p class="hint">
+    Each row is one order of that product or stack on its own, at today's price.
+    Supplier total = product + fulfilment + shipping + @settings.SupplierProcessingPercent.ToString("0.##")% processing.
+    Card fees are @settings.CardProcessingPercent.ToString("0.##")% + @Money.Format(settings.CardProcessingFixed) per payment.
+    Subscriptions are @Model.SubscriptionDiscountPercent% off. Orders with several products cost less per item than shown here.
+</p>
+
+<div class="table-wrap">
+    <table class="profit">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th class="num">Price</th>
+                <th class="num">Product</th>
+                <th class="num">Fulfilment</th>
+                <th class="num">Shipping</th>
+                <th class="num">Supplier fee</th>
+                <th class="num">Supplier total</th>
+                <th class="num">Card fee</th>
+                <th class="num">Profit</th>
+                <th class="num">Margin</th>
+                <th class="num">Subscription profit</th>
+                <th class="num">Break-even price</th>
+                <th>Costs updated</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in Model.Rows)
+            {
+                <tr class="@(row.IsActive ? null : "inactive")">
+                    <td>
+                        <a asp-controller="Products" asp-action="Edit" asp-route-id="@row.ProductId">@row.Name</a>
+                        @if (row.IsStack)
+                        {
+                            <span class="tag">Stack</span>
+                        }
+                        @if (!row.IsActive)
+                        {
+                            <span class="tag off">Hidden</span>
+                        }
+                    </td>
+                    <td class="num">@Money.Format(row.Price)</td>
+                    @if (row.Missing is not null)
+                    {
+                        <td colspan="10" class="missing">@row.Missing</td>
+                    }
+                    else
+                    {
+                        <td class="num">@Money.Format(row.ProductCost)</td>
+                        <td class="num">@Money.Format(row.Fulfillment)</td>
+                        <td class="num">@Money.Format(row.Shipping)</td>
+                        <td class="num">@Money.Format(row.SupplierFee)</td>
+                        <td class="num">@Money.Format(row.SupplierTotal)</td>
+                        <td class="num">@Money.Format(row.CardFee)</td>
+                        <td class="num @(row.Profit < 0 ? "loss" : null)"><strong>@Money.Format(row.Profit)</strong></td>
+                        <td class="num">@row.Margin.ToString("P0")</td>
+                        <td class="num @(row.SubscriptionProfit < 0 ? "loss" : null)">@Money.Format(row.SubscriptionProfit)</td>
+                        <td class="num">@Money.Format(row.BreakEven)</td>
+                    }
+                    <td>@AdminFormat.Date(row.CostsUpdatedAt)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,73 @@
+@inject Microsoft.Extensions.Options.IOptions<StoreOptions> Options
+@{
+    var store = Options.Value;
+    ViewData["Title"] = "Privacy policy";
+}
+
+<p>This policy explains what personal information @store.LegalName ("we") collects when you use this website, and how we use it.</p>
+
+<h2>What we collect</h2>
+<ul>
+    <li><strong>Contact details:</strong> your name, email address and, if you give it, your phone number.</li>
+    <li><strong>Shipping address</strong> for delivering your orders.</li>
+    <li><strong>Order and subscription history:</strong> what you bought, when, and your subscription settings.</li>
+    <li>
+        <strong>Payment information:</strong> payments are processed by PayPal. We never see or store your full card
+        number. For subscriptions, PayPal gives us a reference to your saved payment method so we can charge renewals.
+    </li>
+    <li><strong>Messages</strong> you send us.</li>
+</ul>
+
+<h2>How we use it</h2>
+<ul>
+    <li>To process, ship and support your orders.</li>
+    <li>To charge subscription renewals and send renewal reminders and receipts.</li>
+    <li>To send you emails about your orders, subscription and account, such as sign-in links.</li>
+    <li>To prevent fraud and meet our legal, tax and accounting obligations.</li>
+</ul>
+<p>We don't send marketing emails without your permission.</p>
+
+<h2>Who we share it with</h2>
+<p>We share only what each service needs to do its job:</p>
+<ul>
+    <li><strong>PayPal</strong>, to process payments and refunds.</li>
+    <li><strong>Our fulfilment partners</strong>, who pack and ship your orders, and the order system that passes orders to them (your name, email and shipping address, and what you ordered).</li>
+    <li><strong>USPS</strong> or other carriers, to deliver your order.</li>
+    <li><strong>Our email provider</strong>, to send you emails.</li>
+    <li>Authorities, when the law requires it.</li>
+</ul>
+<p>We don't sell your personal information or share it for advertising.</p>
+
+<h2>Cookies</h2>
+<p>
+    We use only the cookies the site needs to work: one to remember your cart, one to keep you signed in, and one that
+    protects forms from misuse. We don't use advertising or tracking cookies.
+</p>
+
+<h2>How long we keep it</h2>
+<p>
+    We keep order records for as long as tax and accounting rules require, usually 7 years. Other information is kept
+    while you have an active account or subscription, and deleted on request where we're not required to keep it.
+</p>
+
+<h2>Your choices and rights</h2>
+<p>
+    You can ask us to show you, correct or delete the personal information we hold about you, and depending on where you
+    live you may have further rights, such as those under California law. Email @store.ContactEmail and we'll respond
+    within 30 days. We won't treat you differently for making a request.
+</p>
+
+<h2>Security</h2>
+<p>
+    We protect your information with encrypted connections, restricted access and by never storing card numbers. No
+    system is perfectly secure, but we work to keep your information safe.
+</p>
+
+<h2>Children</h2>
+<p>Our products are for adults. We don't knowingly collect information from anyone under 18.</p>
+
+<h2>Changes</h2>
+<p>We'll post any changes to this policy here and update the date at the top. Significant changes will be emailed to customers.</p>
+
+<h2>Contact</h2>
+<p>@store.LegalName · @store.ContactEmail</p>

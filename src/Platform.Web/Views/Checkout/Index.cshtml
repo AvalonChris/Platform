@@ -80,13 +80,19 @@
                     <input asp-for="Form.AcceptRenewal" />
                     <label asp-for="Form.AcceptRenewal">
                         I agree that my subscription items renew automatically at @Money.Format(Model.Cart.RenewalTotal)
-                        per delivery, on the schedule shown for each item, until I cancel.
+                        per delivery, on the schedule shown for each item, until I cancel. I can skip, pause or cancel
+                        any time online. See the <a asp-controller="Pages" asp-action="SubscriptionTerms" target="_blank">subscription terms</a>.
                     </label>
                 </div>
                 <span class="field-error" asp-validation-for="Form.AcceptRenewal"></span>
             }
 
-            <button class="button" type="submit">Place order · @Money.Format(Model.Total)</button>
+            <button class="button" type="submit">@(Model.PayOnNextStep ? "Continue to payment" : "Place order") · @Money.Format(Model.Total)</button>
+            <p class="checkout-agreement">
+                By placing your order you agree to our <a asp-controller="Pages" asp-action="Terms" target="_blank">terms</a>,
+                <a asp-controller="Pages" asp-action="Privacy" target="_blank">privacy policy</a> and
+                <a asp-controller="Pages" asp-action="ShippingAndRefunds" target="_blank">refund policy</a>.
+            </p>
         </form>
 
         <aside class="summary">

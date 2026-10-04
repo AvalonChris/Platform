@@ -1,0 +1,15 @@
+@inject Microsoft.Extensions.Options.IOptions<StoreOptions> Options
+@{
+    var store = Options.Value;
+    ViewData["Title"] = "Contact";
+    ViewData["ShowUpdated"] = false;
+}
+
+<p>Questions about an order, a refund or your subscription? Email us and we'll reply within 2 business days.</p>
+<p class="contact-email"><strong>@store.ContactEmail</strong></p>
+<p class="muted">Please include your order number if your question is about an order.</p>
+
+<h2>Manage your subscription yourself</h2>
+<p>You can skip, pause, change or cancel any time from <a asp-controller="Account" asp-action="Index">your account</a>.</p>
+
+<p class="muted">@store.LegalName</p>

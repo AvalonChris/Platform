@@ -1,0 +1,77 @@
+@model PaymentPageViewModel
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+@{
+    var order = Model.Order.Order;
+    ViewData["Title"] = "Payment";
+
+    // Subscription orders only offer PayPal and cards, which can be saved for renewals.
+    var sdkUrl = "https://www.paypal.com/sdk/js"
+        + $"?client-id={Uri.EscapeDataString(Model.PayPalClientId)}"
+        + "&components=buttons,card-fields&currency=USD&intent=capture"
+        + (Model.AllowAlternativeFunding ? "&enable-funding=venmo" : "&disable-funding=venmo,paylater");
+}
+
+<section class="section">
+    <h1>Payment</h1>
+
+    <div class="cart">
+        <div class="checkout-form" id="paypal-checkout"
+             data-create-url="@Url.Action("CreatePayPalOrder", new { token = Model.Token })"
+             data-capture-url="@Url.Action("CapturePayPalOrder", new { token = Model.Token })"
+             data-request-token="@Antiforgery.GetAndStoreTokens(Context).RequestToken">
+
+            <div class="alert" id="payment-message" role="alert" hidden></div>
+
+            <noscript>
+                <div class="alert">Payment needs JavaScript. Please turn it on in your browser to continue.</div>
+            </noscript>
+
+            <div class="panel form-section">
+                <h2>Pay with PayPal</h2>
+                <div id="paypal-buttons" class="paypal-buttons"></div>
+            </div>
+
+            <div class="panel form-section" id="card-section" hidden>
+                <h2>Or pay by card</h2>
+                <div id="card-name" class="card-field"></div>
+                <div id="card-number" class="card-field"></div>
+                <div class="field-row">
+                    <div id="card-expiry" class="card-field field"></div>
+                    <div id="card-cvv" class="card-field field"></div>
+                </div>
+                <div><button class="button" id="card-submit" type="button">Pay @Money.Format(order.Total)</button></div>
+            </div>
+
+            <p class="muted">
+                Payments are processed securely by PayPal. Your card details never reach our servers.
+                <a asp-action="Index">Change your details</a>
+            </p>
+        </div>
+
+        <aside class="summary">
+            <h2>Order @order.OrderNumber</h2>
+            @foreach (var item in Model.Order.Items)
+            {
+                <div class="summary-row">
+                    <div>
+                        <div>@item.Quantity × @item.ProductName</div>
+                        <div class="card-spec">@item.PlanText</div>
+                    </div>
+                    <strong>@Money.Format(item.LineTotal)</strong>
+                </div>
+            }
+            <hr />
+            <div class="summary-row"><span>Subtotal</span><strong>@Money.Format(order.Subtotal)</strong></div>
+            <div class="summary-row"><span>Shipping</span><span>@(order.ShippingTotal == 0 ? "Free" : Money.Format(order.ShippingTotal))</span></div>
+            <div class="summary-row"><span>Total</span><strong>@Money.Format(order.Total)</strong></div>
+            <div class="muted">
+                Shipping to @order.ShipFullName, @order.ShipCity, @order.ShipRegion @order.ShipPostalCode
+            </div>
+        </aside>
+    </div>
+</section>
+
+@section Scripts {
+    <script src="@sdkUrl"></script>
+    <script src="~/js/paypal-checkout.js" asp-append-version="true"></script>
+}

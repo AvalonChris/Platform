@@ -21,6 +21,7 @@ public class ProductsController(AdminProductRepository products) : AdminControll
         form.Id = 0;
         if (form.Kind is not (Product.KindSingle or Product.KindStack))
             ModelState.AddModelError("Form.Kind", "Choose a kind.");
+        ValidateComponents(form);
 
         if (ModelState.IsValid && await TrySaveAsync(() => products.CreateAsync(form)))
         {
@@ -47,6 +48,7 @@ public class ProductsController(AdminProductRepository products) : AdminControll
 
         form.Id = id;
         form.Kind = existing.Kind;
+        ValidateComponents(form);
 
         if (ModelState.IsValid && await TrySaveAsync(() => products.UpdateAsync(form)))
         {
@@ -55,6 +57,23 @@ public class ProductsController(AdminProductRepository products) : AdminControll
         }
 
         return await EditViewAsync(form);
+    }
+
+    private void ValidateComponents(ProductForm form)
+    {
+        if (!form.IsStack)
+            return;
+
+        // A blank or non-numeric box fails binding under its own key, which the form doesn't display.
+        var unreadable = ModelState.Any(entry =>
+            entry.Key.StartsWith("Form.ComponentQuantities[", StringComparison.OrdinalIgnoreCase) && entry.Value?.Errors.Count > 0);
+
+        if (unreadable)
+            ModelState.AddModelError("Form.ComponentQuantities", "Enter a whole number in every quantity box (0 to leave a product out).");
+        else if (form.ComponentQuantities.Values.Any(quantity => quantity is < 0 or > ProductForm.MaxComponentQuantity))
+            ModelState.AddModelError("Form.ComponentQuantities", $"Quantities must be between 0 and {ProductForm.MaxComponentQuantity}.");
+        else if (form.ComponentQuantities.Values.Sum() == 0)
+            ModelState.AddModelError("Form.ComponentQuantities", "A stack needs at least one product.");
     }
 
     private async Task<IActionResult> EditViewAsync(ProductForm form)
