@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- The logo's icon: a "b" followed by a text cursor, white on ink. Drawn as shapes so it doesn't depend on fonts. -->
+  <rect width="64" height="64" rx="14" fill="#0F1F1A"/>
+  <rect x="12" y="11" width="8" height="40" rx="1" fill="#FFFFFF"/>
+  <circle cx="27.5" cy="39.5" r="10" fill="none" stroke="#FFFFFF" stroke-width="7.5"/>
+  <rect x="43" y="31" width="9" height="20" fill="#FFFFFF"/>
+</svg>

@@ -14,8 +14,10 @@ These take the longest and gate PayPal live approval, insurance and the legal pa
 - [ ] Register for sales tax in your home state. Check whether you need to collect it there from day one.
 - [ ] Get product liability insurance quotes (Supliful's referral, Assureful, a specialist broker) and buy a policy.
       Mention NMN specifically.
-- [ ] Have a lawyer review the policy pages (`/shipping-and-refunds`, `/subscription-terms`, `/privacy`, `/terms`)
-      and the product descriptions.
+- [ ] Check and file the "Bodyware" trademark: see [trademark-steps.md](trademark-steps.md). Do this before printing
+      labels or buying more domains.
+- [ ] Have the policy pages (`/shipping-and-refunds`, `/subscription-terms`, `/privacy`, `/terms`) and product
+      descriptions reviewed if you can: a lawyer, or free help such as a law school clinic (see trademark-steps.md).
 
 ## Phase 2: Brand, domain and email
 

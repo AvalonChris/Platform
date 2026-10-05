@@ -3,9 +3,12 @@
     --muted: #4B5A54;
     --line: #D5DBD5;
     --tile: #EEF1EE;
-    --accent: #CDEB45;
-    --display: 'Bricolage Grotesque', sans-serif;
-    --mono: 'IBM Plex Mono', monospace;
+    /* Brand: ink on white. Accent surfaces (buttons, badges) are ink with white text. */
+    --accent: #0F1F1A;
+    --on-accent: #FFFFFF;
+    --display: 'Manrope', 'Helvetica Neue', sans-serif;
+    /* Font for product facts: spec lines, eyebrow labels, badges. */
+    --detail: 'Manrope', system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -17,7 +20,7 @@ body {
     flex-direction: column;
     background: #FFFFFF;
     color: var(--ink);
-    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    font-family: 'Manrope', system-ui, sans-serif;
     font-size: 16px;
     line-height: 1.5;
 }
@@ -44,7 +47,11 @@ main { flex-grow: 1; }
 .site-nav { display: flex; }
 .site-nav a { padding: 10px 8px; min-height: 44px; font-weight: 500; text-decoration: none; }
 .site-nav a:hover { text-decoration: underline; }
-.site-logo { padding: 6px 0; font-family: var(--display); font-weight: 700; font-size: 24px; letter-spacing: -0.02em; text-decoration: none; }
+.site-logo { padding: 6px 0; font-size: 26px; text-decoration: none; }
+
+/* The wordmark: the brand name followed by a text cursor, sized from the font size it's set in. */
+.wordmark { display: inline-flex; align-items: flex-end; gap: 0.08em; font-family: 'Manrope', 'Helvetica Neue', sans-serif; font-weight: 800; line-height: 1; letter-spacing: -0.04em; }
+.wordmark-cursor { display: block; width: 0.38em; height: 0.72em; margin-bottom: 0.06em; background: currentColor; }
 .site-header-end { justify-self: end; display: flex; align-items: center; gap: 4px; }
 .account-link { padding: 10px 8px; min-height: 44px; display: inline-flex; align-items: center; font-weight: 500; text-decoration: none; }
 .account-link:hover { text-decoration: underline; }
@@ -53,22 +60,24 @@ main { flex-grow: 1; }
 .site-footer p { max-width: 760px; margin: 12px 0 0; }
 .site-footer-links { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-top: 12px; }
 .site-footer-links a { color: #FFFFFF; min-height: 32px; display: inline-flex; align-items: center; }
-.site-footer-brand { color: #FFFFFF; font-family: var(--display); font-weight: 700; font-size: 22px; }
+.site-footer-brand { color: #FFFFFF; font-size: 24px; }
 
 .section { padding-block: 40px 16px; }
 .section:last-child { padding-bottom: 72px; }
 .section-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
 .section-head a { font-weight: 600; }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 36px 20px; }
 
-.card { display: flex; flex-direction: column; gap: 12px; padding: 12px; border: 1px solid var(--line); border-radius: 16px; text-decoration: none; }
-.card:hover { border-color: var(--ink); }
-.card-media { display: block; height: 200px; border-radius: 10px; background: var(--tile); overflow: hidden; }
-.card-media img { width: 100%; height: 100%; object-fit: cover; }
-.card-body { display: flex; flex-direction: column; gap: 2px; padding: 0 4px 4px; }
+/* Products sit directly on the page: no box around them, just the photo and the details below it. */
+.card { display: flex; flex-direction: column; gap: 14px; text-decoration: none; }
+.card:hover .card-name { text-decoration: underline; }
+/* Product photos are square, so the image areas are square too. */
+.card-media { display: block; aspect-ratio: 1 / 1; border-radius: 14px; background: var(--tile); overflow: hidden; }
+.card-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.card-body { display: flex; flex-direction: column; gap: 2px; }
 .card-name { font-weight: 600; font-size: 17px; }
-.card-spec { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+.card-spec { font-family: var(--detail); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .card-price { margin-top: 8px; font-size: 14px; color: var(--muted); }
 .card-price strong { font-size: 16px; font-weight: 600; color: var(--ink); }
 
@@ -77,12 +86,12 @@ main { flex-grow: 1; }
 .pill[aria-current="page"] { background: var(--ink); color: #FFFFFF; }
 
 .product { display: flex; flex-wrap: wrap; gap: 40px; }
-.product-media { flex: 1 1 380px; min-height: 420px; border-radius: 20px; background: var(--tile); overflow: hidden; }
-.product-media img { width: 100%; height: 100%; object-fit: cover; }
+.product-media { flex: 1 1 380px; align-self: flex-start; aspect-ratio: 1 / 1; border-radius: 20px; background: var(--tile); overflow: hidden; }
+.product-media img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .product-info { flex: 1 1 380px; display: flex; flex-direction: column; gap: 16px; }
 .product-info h1 { font-size: clamp(32px, 4.5vw, 48px); }
 .product-info p { margin: 0; color: var(--muted); }
-.eyebrow { font-family: var(--mono); font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.eyebrow { font-family: var(--detail); font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
 .panel { border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
 .panel ul { margin: 6px 0 0; padding-left: 20px; }
 
@@ -91,7 +100,7 @@ main { flex-grow: 1; }
 
 button, input { font: inherit; }
 button:focus-visible, input:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
-.button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 14px 28px; border: none; border-radius: 999px; background: var(--accent); color: var(--ink); font-weight: 600; text-decoration: none; cursor: pointer; }
+.button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 14px 28px; border: none; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-weight: 600; text-decoration: none; cursor: pointer; }
 .link-button { min-height: 44px; padding: 10px 4px; border: none; background: none; color: var(--ink); font-size: 14px; text-decoration: underline; cursor: pointer; }
 .qty { width: 76px; min-height: 48px; padding: 10px 12px; border: 1.5px solid var(--ink); border-radius: 999px; background: #FFFFFF; color: var(--ink); text-align: center; }
 .cart-link { display: inline-flex; align-items: center; min-height: 44px; padding: 10px 14px; border-radius: 999px; background: var(--ink); color: #FFFFFF; font-weight: 500; text-decoration: none; white-space: nowrap; }
@@ -105,7 +114,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--ink); outli
 .option input { width: 20px; height: 20px; margin: 0; accent-color: var(--ink); }
 .option-text { flex-grow: 1; display: flex; flex-direction: column; }
 .option-text small { font-size: 14px; color: var(--muted); }
-.badge { padding: 2px 8px; border-radius: 6px; background: var(--accent); font-family: var(--mono); font-size: 12px; font-weight: 500; }
+.badge { padding: 2px 8px; border-radius: 6px; background: var(--accent); color: var(--on-accent); font-family: var(--detail); font-size: 12px; font-weight: 600; }
 .frequency legend { padding: 0; font-size: 14px; font-weight: 600; }
 .frequency .pills { margin: 8px 0 0; }
 /* Delivery frequency only applies to subscriptions. */
@@ -179,7 +188,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--ink); outli
 .subscription { display: flex; flex-direction: column; gap: 10px; }
 .subscription-head { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
 .status-tag { padding: 2px 10px; border-radius: 999px; border: 1px solid var(--line); font-size: 13px; text-transform: capitalize; }
-.status-active { background: var(--accent); border-color: var(--accent); }
+.status-active { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .subscription-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .subscription-actions form { margin: 0; }
 .subscription-actions .pill { background: #FFFFFF; cursor: pointer; }

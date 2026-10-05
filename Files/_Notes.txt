@@ -1,8 +1,18 @@
-COMPETITORS:
+COMPETITORS
 	https://donotage.org/
 	https://biogena.com/
 	https://healf.com/
 	https://www.prohealth.com/
+	
+SIMILAR
+	https://www.dermstore.com/
+		Manrope
+	https://www.ulta.com/
+		Circular
+	https://www.sephora.com/
+		"helvetica neue"
+	https://theordinary.com/
+		Raleway
 	
 DOMAINS
 	platformbiology.com (platformbio.com NOT in use)

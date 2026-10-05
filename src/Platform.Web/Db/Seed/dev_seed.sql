@@ -91,6 +91,11 @@ from (values
 join products s on s.slug = contents.stack_slug
 join products c on c.slug = contents.component_slug;
 
+-- Placeholder photos (plain, unlabelled Supliful bottles) until there are photos of the real labels.
+update products p
+set image_url = '/images/products/' || p.slug || '.webp'
+where p.slug in ('nmn', 'resveratrol', 'coq10', 'magnesium-glycinate', 'nmn-3-month-supply', 'longevity-stack');
+
 -- Placeholder products from the first prototype, kept only because past test orders refer to them.
 update products
 set is_active = false, is_featured = false, is_new = false, updated_at = now()
